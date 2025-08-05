@@ -59,7 +59,7 @@ export default function LoginPreview({
     setIsLoading(true)
     try {
       const response = await api.post(
-        "http://localhost:4000/api/v1/auth/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
         values
       );
       if (response.status == 200) {

@@ -71,7 +71,7 @@ export default function RegisterForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const response = await api.post(
-        "http://localhost:4000/api/register",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         values
       );
       if (response.status == 200) {
