@@ -44,7 +44,7 @@ export const useDashboard = (userId?: string) => {
         setLoading(true);
         const [userRes, accountsRes] = await Promise.all([
           api.get(`/private/api/v1/users/${userId}`),
-          api.get(`/private/api/v1/accounts`)
+          api.get(`/private/api/v1/accounts/${userId}?is_active=true`)
         ]);
 
         setUser(userRes.data);
@@ -67,5 +67,6 @@ export const useDashboard = (userId?: string) => {
   }, [userId]);
   
   console.log("user", user);
+  console.log("error", error);
   return { user, accounts, loading, error };
 };

@@ -6,7 +6,7 @@ const useLogout = () => {
 
     const logout = async () => {
         try {
-            await api.post("/api/logout");
+            await api.post("/api/v1/auth/logout");
             router.push("/login")
         } catch (error) {
             console.log("failed to logout:", error);
