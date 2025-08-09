@@ -27,6 +27,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from "../ui/password-input"
 import api from "@/lib/axiosInstance";
+import { toSnakeCase } from "@/utils/case-converter"
 
 const formSchema = z
   .object({
@@ -70,9 +71,11 @@ export default function RegisterForm({
   const router = useRouter();
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      const payload = toSnakeCase(values);
+      
       const response = await api.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        values
+        payload
       );
       if (response.status == 200) {
         router.push("/login");
