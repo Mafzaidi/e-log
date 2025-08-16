@@ -1,72 +1,32 @@
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/axiosInstance";
 
-// import { useQuery } from "@tanstack/react-query";
-// import api from "@/lib/axiosInstance";
-
-// export const fetchDashboard = async () => {
-//   const { data } = await api.get("/private/api/dashboard");
-//   return data;
-// };
-
-// export function useDashboard() {
-//   return useQuery({
-//     queryKey: ["dashboard"],
-//     queryFn: fetchDashboard,
-//   });
-// }
-
-import { useEffect, useState } from "react";
-import api from "@/lib/axiosInstance"; // axios instance
-
-type UserData = {
-  id: string;
-  username: string;
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  group: string;
+type DashboardData = {
+  user: {
+    id: string;
+    username: string;
+    fullName: string;
+    email: string;
+  };
+  accounts: { id: string; accountName: string }[];
 };
 
-type AccountData = {
-  id: string;
-  accountName: string;
-  // sesuaikan dengan response API
-};
+export function useDashboard(userId?: string) {
+  return useQuery<DashboardData>({
+    queryKey: ["dashboard", userId],
+    queryFn: async () => {
+      const [userRes, accountsRes] = await Promise.all([
+        api.get(`/private/api/v1/users/${userId}`),
+        api.get(`/private/api/v1/accounts/${userId}?is_active=true`),
+      ]);
+      console.log(accountsRes);
+      
+      return {
+        user: userRes.data,
+        accounts: accountsRes.data,
+      };
+    },
+    enabled: !!userId,
+  });
+}
 
-export const useDashboard = (userId?: string) => {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [accounts, setAccounts] = useState<AccountData[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const [userRes, accountsRes] = await Promise.all([
-          api.get(`/private/api/v1/users/${userId}`),
-          api.get(`/private/api/v1/accounts/${userId}?is_active=true`)
-        ]);
-
-        setUser(userRes.data);
-        setAccounts(accountsRes.data);
-        
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchDashboardData();
-    }
-  }, [userId]);
-  
-  console.log("user", user);
-  console.log("error", error);
-  return { user, accounts, loading, error };
-};

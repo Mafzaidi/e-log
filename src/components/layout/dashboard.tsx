@@ -1,6 +1,5 @@
 "use client";
 
-import { useDashboard } from "@/hooks/use-dashboard";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -10,26 +9,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useUser } from "@/context/user-context";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useDashboard } from "@/hooks/use-dashboard";
 import { User } from "@/types/user";
 import { SkeletonDashboard } from "@/components/layout/skeleton-dahboard";
 
 export default function Dashboard() {
-  const { user } = useUser();
-
-  const { user: userDetail, accounts, loading, error } = useDashboard(user?.id);
-  console.log(accounts);
-  // console.log("user detail", userDetail);
   
+  const { data: currentUser, isLoading: loadingUser } = useCurrentUser();
+  const { data: dashboardData, isLoading: loadingDashboard } = useDashboard(currentUser?.id);
+  if (loadingUser || loadingDashboard) return <SkeletonDashboard />;
+  if (!currentUser) return <p>Anda belum login</p>;
   
-  if (loading) return <DashboardSkeleton />;
-  if (error) return <DashboardError />;
-
-  // const user = data?.data?.user;
-
   return (
     <section className="grid grid-cols-1 gap-4 px-4 lg:grid-cols-2 xl:grid-cols-4 lg:px-6">
-      <UserCard user={userDetail}/>
-      {/* Tambahkan komponen data lainnya di sini */}
+      <UserCard user={currentUser}/>
     </section>
   );
 }
